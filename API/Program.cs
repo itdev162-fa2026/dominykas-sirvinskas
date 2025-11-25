@@ -1,8 +1,13 @@
+using Stripe;
 using Persistence;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Configure Stripe API key
+StripeConfiguration.ApiKey = builder.Configuration["Stripe:SecretKey"];
+
+// Add CORS services
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReactApp",
@@ -13,6 +18,7 @@ builder.Services.AddCors(options =>
                   .AllowAnyMethod();
         });
 });
+
 
 // Add services to the container.
 builder.Services.AddControllers()
