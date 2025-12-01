@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { createOrder } from "../../services/api";
+import { createCheckoutSession } from "../../services/api";
 import "./Checkout.css";
 
+// eslint-disable-next-line no-unused-vars
 function Checkout({ cartItems, cartTotal, clearCart }) {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
@@ -30,17 +31,21 @@ function Checkout({ cartItems, cartTotal, clearCart }) {
     setError(null);
 
     try {
-      // Create order via API
-      const order = await createOrder(email, cartItems);
+      // Create checkout session in backend
+      const { url } = await createCheckoutSession(email, cartItems);
 
-      // Clear cart from localStorage
-      clearCart();
+      if (!url) {
+        throw new Error("No checkout URL received from server");
+      }
 
-      // Navigate to success page with order ID
-      navigate(`/order/success?orderId=${order.id}`);
+      // Redirect to Stripe Checkout using the URL
+      window.location.href = url;
+
+      // Note: If redirect succeeds, user will leave this page
+      // Cart will be cleared on the success page after payment
     } catch (err) {
-      console.error("Order creation error:", err);
-      setError(err.message || "Failed to create order. Please try again.");
+      console.error("Checkout error:", err);
+      setError(err.message || "Failed to start checkout. Please try again.");
       setLoading(false);
     }
   };
@@ -112,13 +117,10 @@ function Checkout({ cartItems, cartTotal, clearCart }) {
               className="checkout-button"
               disabled={loading}
             >
-              {loading ? "Processing..." : "Place Order"}
+              {loading ? "Redirecting to payment..." : "Proceed to Payment"}
             </button>
 
-            <p className="next-activity-note">
-              💡 Note: In Activity 11, we'll add Stripe payment processing to
-              this checkout flow.
-            </p>
+            <p className="secure-notice">🔒 Secure payment powered by Stripe</p>
           </form>
         </div>
       </div>
