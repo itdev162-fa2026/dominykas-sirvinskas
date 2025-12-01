@@ -7,6 +7,7 @@ import ProductList from "./components/ProductList";
 import ProductDetail from "./components/ProductDetail";
 import Checkout from "./components/Checkout/Checkout";
 import OrderSuccess from "./components/Checkout/OrderSuccess";
+import CheckoutCancelled from "./components/Checkout/CheckoutCancelled";
 import "./App.css";
 
 function App() {
@@ -110,10 +111,12 @@ useEffect(() => {
       <main className="app-main">
         <Routes>
   <Route path="/" element={<ProductList />} />
+
   <Route
     path="/products/:id"
     element={<ProductDetail addToCart={addToCart} />}
   />
+
   <Route
     path="/checkout"
     element={
@@ -124,8 +127,15 @@ useEffect(() => {
       />
     }
   />
-  <Route path="/order/success" element={<OrderSuccess />} />
+
+  <Route
+  path="/order/success"
+  element={<OrderSuccess clearCart={clearCart} />}
+/>
+
+  <Route path="/checkout/cancelled" element={<CheckoutCancelled />} />
 </Routes>
+
 
       </main>
 
